@@ -1,6 +1,6 @@
 ---start oauth server
 
-go run server.go
+    go run server.go
 
 
 ---Step1: client sends the following authorization request to authorization server to activate the oAuth 2.0 process 
