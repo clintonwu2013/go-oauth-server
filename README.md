@@ -26,6 +26,9 @@ header Basic Auth:
     Password=22222222
 
 x-www-form-urlencoded parameters:
+
     code={{code}}
+
     grant_type=authorization_code
+    
     redirect_uri=http%3A%2F%2Flocalhost%3A9094%2Foauth2
