@@ -22,8 +22,8 @@
     http://localhost:9096/oauth/token
 
     header Basic Auth:
-    Username=222222
-    Password=22222222
+        Username=222222
+        Password=22222222
 
     x-www-form-urlencoded parameters:
 
