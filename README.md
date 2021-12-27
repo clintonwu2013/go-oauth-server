@@ -7,7 +7,7 @@
 
     GET
 
-    http://localhost:9096/oauth/authorize?response_type=code&client_id=222222&state=xyz&redirect_uri=http%3A%2F%2Flocalhost%3A9094%2Foauth2&scope=openid
+    http://localhost:9096/oauth/authorize?response_type=code&client_id=222222&state=xyz&redirect_uri=http%3A%2F%2Flocalhost%3A9094%2Foauth2&scope=openid&nonce=cdef
 
 
 ---Step2: 
@@ -31,4 +31,4 @@
 
         grant_type=authorization_code
     
-        redirect_uri=http%3A%2F%2Flocalhost%3A9094%2Foauth2
+        redirect_uri=http://localhost:9094/oauth2
