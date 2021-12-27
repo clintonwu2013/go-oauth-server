@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/go-oauth2/oauth2/v4/errors"
@@ -16,6 +17,7 @@ import (
 	"github.com/go-oauth2/oauth2/v4/server"
 	"github.com/go-oauth2/oauth2/v4/store"
 	"github.com/go-session/session"
+	"github.com/golang-jwt/jwt"
 )
 
 var (
@@ -28,7 +30,19 @@ var (
 	scope                 = "all"
 	code_challenge_method = "S256"
 	state                 = "xyz"
+	jwtSecret             = []byte("jwtSecret_changingtec")
 )
+
+type Claims struct {
+	UID    string `json:"UID"`
+	Name   string `json:"name"`
+	Domain string `json:"domain"`
+	Email  string `json:"email"`
+	Phone  string `json:"phone"`
+	Group  string `json:"group"`
+	Nonce  string `json:"nonce,omitempty"`
+	jwt.StandardClaims
+}
 
 func main() {
 
@@ -106,6 +120,31 @@ func main() {
 		}
 		tokenData := srv.GetTokenData(ti)
 
+		//produce id token
+		//nonce := r.FormValue("nonce")
+		uid := ti.GetUserID()
+		claims := Claims{
+			UID:    uid,
+			Name:   "TestUser",
+			Domain: "ad2008.vm",
+			Email:  "timo123@changingtec.com",
+			Group:  "AllUser,ad2008AD",
+			Phone:  "0912345678",
+			//Nonce:  nonce,
+			StandardClaims: jwt.StandardClaims{
+				ExpiresAt: time.Now().Add(7200 * time.Second).Unix(),
+				IssuedAt:  time.Now().Unix(),
+				Issuer:    "changingtec.com",
+			},
+		}
+		idTokenClaims := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+		idToken, err := idTokenClaims.SignedString(jwtSecret)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		tokenData["id_token"] = idToken
+
 		fmt.Println("tokenData[access_token]=", tokenData["access_token"])
 		fmt.Println("tokenData[expires_in]=", tokenData["expires_in"])
 
@@ -164,7 +203,12 @@ func userAuthorizeHandler(w http.ResponseWriter, r *http.Request) (userID string
 	if err != nil {
 		return
 	}
-
+	scope = r.FormValue("scope")
+	fmt.Println("####### scope=", scope)
+	if !strings.Contains(scope, "openid") {
+		http.Error(w, "accept only scope=openid", http.StatusBadRequest)
+		return
+	}
 	uid, ok := store.Get("LoggedInUserID")
 	if !ok {
 		if r.Form == nil {
