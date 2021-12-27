@@ -121,8 +121,18 @@ func main() {
 		tokenData := srv.GetTokenData(ti)
 
 		//produce id token
-		//nonce := r.FormValue("nonce")
-		uid := ti.GetUserID()
+		uidTmp := ti.GetUserID()
+		uidAndNonce := strings.Split(uidTmp, "_")
+		fmt.Println("##### uidAndNonce=", uidAndNonce)
+		var uid string
+		var nonce string
+		for i := range uidAndNonce {
+			if i == 0 {
+				uid = uidAndNonce[i]
+			} else {
+				nonce = uidAndNonce[i]
+			}
+		}
 		now := time.Now()
 		claims := Claims{
 			UID:    uid,
@@ -131,7 +141,7 @@ func main() {
 			Email:  "timo123@changingtec.com",
 			Group:  "AllUser,ad2008AD",
 			Phone:  "0912345678",
-			//Nonce:  nonce,
+			Nonce:  nonce,
 			StandardClaims: jwt.StandardClaims{
 				ExpiresAt: now.Add(7200 * time.Second).Unix(),
 				IssuedAt:  now.Unix(),
@@ -221,7 +231,9 @@ func userAuthorizeHandler(w http.ResponseWriter, r *http.Request) (userID string
 		w.WriteHeader(http.StatusFound)
 		return
 	}
-	userID = uid.(string)
+	nonce := r.FormValue("nonce")
+	fmt.Println("####### nonce=", nonce)
+	userID = uid.(string) + "_" + nonce
 	store.Delete("LoggedInUserID")
 	store.Save()
 	return
