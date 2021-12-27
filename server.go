@@ -123,6 +123,7 @@ func main() {
 		//produce id token
 		//nonce := r.FormValue("nonce")
 		uid := ti.GetUserID()
+		now := time.Now()
 		claims := Claims{
 			UID:    uid,
 			Name:   "TestUser",
@@ -132,8 +133,8 @@ func main() {
 			Phone:  "0912345678",
 			//Nonce:  nonce,
 			StandardClaims: jwt.StandardClaims{
-				ExpiresAt: time.Now().Add(7200 * time.Second).Unix(),
-				IssuedAt:  time.Now().Unix(),
+				ExpiresAt: now.Add(7200 * time.Second).Unix(),
+				IssuedAt:  now.Unix(),
 				Issuer:    "changingtec.com",
 			},
 		}
