@@ -5,6 +5,8 @@
 
 ---Step1: client sends the following authorization request to authorization server to activate the oAuth 2.0 process 
 
+---Note: log in by using usernaem: timo123 password: 123123 
+
     GET
 
     http://localhost:9096/oauth/authorize?response_type=code&client_id=222222&state=xyz&redirect_uri=http%3A%2F%2Flocalhost%3A9094%2Foauth2&scope=openid&nonce=cdef
