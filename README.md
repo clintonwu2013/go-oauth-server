@@ -5,7 +5,7 @@
 
 ---Step1: client sends the following authorization request to authorization server to activate the oAuth 2.0 process 
 
----Note: log in by using usernaem: timo123 password: 123123 
+---Note: log in by using username: timo123 password: 123123 
 
     GET
 
