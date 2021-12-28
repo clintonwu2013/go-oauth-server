@@ -214,7 +214,7 @@ func userAuthorizeHandler(w http.ResponseWriter, r *http.Request) (userID string
 	if err != nil {
 		return
 	}
-	scope = r.FormValue("scope")
+	scope := r.FormValue("scope")
 	fmt.Println("####### scope=", scope)
 	if !strings.Contains(scope, "openid") {
 		http.Error(w, "accept only scope=openid", http.StatusBadRequest)
@@ -246,17 +246,58 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if r.Method == "POST" {
+	if r.Method == "POST" {		
 		//TODO: VERIFY IN ide AND GET UID
+		var req struct{
+			Username string
+			Password string
+		}
+		err := json.NewDecoder(r.Body).Decode(&req)
+    	if err != nil {
+        	http.Error(w, err.Error(), http.StatusBadRequest)
+        	return
+    	}
+		fmt.Println("##### verify requset=",req)
+		username := req.Username
+		password := req.Password
+		var data struct{
+			ErrorCode int `json:"errorCode"`
+			ErrorMsg  string `json:"errorMsg"`
+		}
+		if !verifyUser(username,password) {
+			
+			data.ErrorCode = -1
+			data.ErrorMsg = "invalid username or password !!!"
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusCreated)
+			json.NewEncoder(w).Encode(data)
+			return
+		}
+		
 		uid := "1"
 		store.Set("LoggedInUserID", uid)
 		store.Save()
-		w.Header().Set("Location", "/auth")
-		w.WriteHeader(http.StatusFound)
+		data.ErrorCode = 0
+		data.ErrorMsg = "verify passed!!!"
+		w.Header().Set("Content-Type", "application/json;charset=UTF-8")
+		w.Header().Set("Cache-Control", "no-store")
+		w.Header().Set("Pragma", "no-cache")
+		w.WriteHeader(http.StatusCreated)
+		json.NewEncoder(w).Encode(data)
 
 		return
 	}
 	outputHTML(w, r, "static/login.html")
+}
+
+func verifyUser(username, password string) (result bool){
+    if username == "timo123" && password == "123123"{
+		result = true
+		return
+	}
+
+	result = false
+	return
 }
 
 func authHandler(w http.ResponseWriter, r *http.Request) {

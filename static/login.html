@@ -7,25 +7,45 @@
     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
     <script src="//code.jquery.com/jquery-2.2.4.min.js"></script>
     <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 </head>
-
+<script>
+    function verifyUser(){
+        let userData = {
+            username: document.getElementById('username').value,
+            password: document.getElementById('password').value
+        }
+        console.log("userData=",userData);
+        axios.post('/login',userData)
+        .then( (response) => {
+            console.log(response.data);
+            if(response.data.errorCode != 0){
+                alert(response.data.errorMsg);
+                return
+            }
+            window.location.href = "/auth";
+            
+        })
+        .catch( (error) => {
+            alert(error);
+        })
+    }
+    
+</script>
 <body>
     <div class="container">
         <h1>Login In</h1>
         <form action="/login" method="POST">
             <div class="form-group">
                 <label for="username">User Name</label>
-                <input type="text" class="form-control" name="username" required placeholder="Please enter your user name">
+                <input type="text" class="form-control" name="username" id="username" required placeholder="Please enter your user name">
             </div>
             <div class="form-group">
                 <label for="password">Password</label>
-                <input type="password" class="form-control" name="password" placeholder="Please enter your password">
+                <input type="password" class="form-control" name="password" id="password" placeholder="Please enter your password">
             </div>
-
             
-
-            <button type="submit" class="btn btn-success">Login</button>
-            <!-- http://localhost:9096/oauth/authorize?&&&&scope=all&&code_challenge=Qn3Kywp0OiU4NK_AFzGPlmrcYJDJ13Abj_jdL08Ahg8 -->
+            <button type="button" onclick="verifyUser()" class="btn btn-success">Login</button>
         </form>
     </div>
 </body>
