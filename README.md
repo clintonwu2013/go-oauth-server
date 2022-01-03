@@ -34,3 +34,19 @@
         grant_type=authorization_code
     
         redirect_uri=http://localhost:9094/oauth2
+
+---Step4: client sends following token request to authorization owner in order to refresh the access token for resource owner
+
+    POST
+
+    http://localhost:9096/oauth/token
+
+    header Basic Auth:
+        Username=222222
+        Password=22222222
+
+    x-www-form-urlencoded parameters:
+
+        grant_type=refresh_token
+    
+        refresh_token={{refresh_token}}

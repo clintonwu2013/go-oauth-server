@@ -101,8 +101,8 @@ func main() {
 	http.HandleFunc("/oauth/token", func(w http.ResponseWriter, r *http.Request) {
 
 		grantType := r.FormValue("grant_type")
-		if grantType != "authorization_code" {
-			http.Error(w, "accept only grant type: authorization_code", http.StatusInternalServerError)
+		if grantType != "authorization_code" && grantType != "refresh_token" {
+			http.Error(w, "accept only grant type: authorization_code, refresh_token", http.StatusInternalServerError)
 			return
 		}
 		ctx := r.Context()
@@ -246,26 +246,26 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if r.Method == "POST" {		
+	if r.Method == "POST" {
 		//TODO: VERIFY IN ide AND GET UID
-		var req struct{
+		var req struct {
 			Username string
 			Password string
 		}
 		err := json.NewDecoder(r.Body).Decode(&req)
-    	if err != nil {
-        	http.Error(w, err.Error(), http.StatusBadRequest)
-        	return
-    	}
-		fmt.Println("##### verify requset=",req)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+		fmt.Println("##### verify requset=", req)
 		username := req.Username
 		password := req.Password
-		var data struct{
-			ErrorCode int `json:"errorCode"`
+		var data struct {
+			ErrorCode int    `json:"errorCode"`
 			ErrorMsg  string `json:"errorMsg"`
 		}
-		if !verifyUser(username,password) {
-			
+		if !verifyUser(username, password) {
+
 			data.ErrorCode = -1
 			data.ErrorMsg = "invalid username or password !!!"
 			w.Header().Set("Content-Type", "application/json")
@@ -273,7 +273,7 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 			json.NewEncoder(w).Encode(data)
 			return
 		}
-		
+
 		uid := "1"
 		store.Set("LoggedInUserID", uid)
 		store.Save()
@@ -290,8 +290,8 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 	outputHTML(w, r, "static/login.html")
 }
 
-func verifyUser(username, password string) (result bool){
-    if username == "timo123" && password == "123123"{
+func verifyUser(username, password string) (result bool) {
+	if username == "timo123" && password == "123123" {
 		result = true
 		return
 	}
